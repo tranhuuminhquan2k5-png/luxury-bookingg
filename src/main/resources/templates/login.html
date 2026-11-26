@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Đăng nhập')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<main class="container page">
+<div class="auth-shell panel">
+<div class="eyebrow">CHÀO MỪNG TRỞ LẠI</div>
+<h1>Đăng nhập</h1>
+<p class="text-muted">Quản lý kỳ nghỉ và trải nghiệm của bạn.</p>
+<div th:if="${param.error}" class="alert alert-danger">Email, mật khẩu không đúng hoặc tài khoản đã bị khóa.</div>
+<div th:if="${param.locked}" class="alert alert-warning">Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.</div>
+<div th:if="${param.logout}" class="alert alert-success">Bạn đã đăng xuất.</div>
+<div th:if="${param.registered}" class="alert alert-success">Đăng ký thành công. Hãy đăng nhập để đặt phòng.</div>
+<form th:action="@{/login}" method="post">
+<label class="form-label" for="username">Email</label>
+<input id="username" name="username" class="form-control" type="email" autocomplete="username" required autofocus>
+<label class="form-label" for="password">Mật khẩu</label>
+<input id="password" name="password" class="form-control" type="password" autocomplete="current-password" required>
+<button class="btn btn-primary w-100 mt-4">Đăng nhập ↗</button>
+</form>
+<p class="small text-center mt-4 mb-0">Chưa có tài khoản? <a th:href="@{/register}">Đăng ký ngay</a>
+</p>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title th:text="${title}+' | Luxury Hotel'">Luxury Hotel</title>
+<link rel="stylesheet" th:href="@{/vendor/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/css/hotel.css}">
+<script defer th:src="@{/vendor/bootstrap.bundle.min.js}">
+</script>
+<script defer th:src="@{/js/hotel.js}">
+</script>
+</head>
+<body>
+<header th:fragment="siteHeader" class="site-header">
+<nav class="navbar navbar-expand-lg container py-3" aria-label="Điều hướng chính">
+<a class="brand" th:href="@{/}">
+<span class="brand-mark">L<span>H</span>
+</span>
+<span>LUXURY HOTEL<small>NGHỈ DƯỠNG &amp; TRẢI NGHIỆM</small>
+</span>
+</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Mở menu">
+<span class="navbar-toggler-icon">
+</span>
+</button>
+<div class="collapse navbar-collapse" id="mainNav">
+<div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+<a class="nav-link" th:href="@{/}">Trang chủ</a>
+<a class="nav-link" th:href="@{/#find-room}">Tìm phòng</a>
+<a th:if="${currentUser!=null}" class="nav-link" th:href="@{/bookings}">Đặt phòng của tôi</a>
+<a th:if="${staff}" class="nav-link" th:href="@{/staff}">Vận hành</a>
+<a th:if="${currentUser==null}" class="nav-link" th:href="@{/register}">Đăng ký</a>
+<a th:if="${currentUser==null}" class="btn btn-primary" th:href="@{/login}">Đăng nhập ↗</a>
+<a th:if="${currentUser!=null}" class="nav-link" th:href="@{/profile}" th:text="${currentUser.fullName}">
+</a>
+<form th:if="${currentUser!=null}" th:action="@{/logout}" method="post">
+<button class="btn btn-outline-primary btn-sm">Đăng xuất</button>
+</form>
+</div>
+</div>
+</nav>
+<div th:if="${demoEarlyCheckIn}" class="container pb-2 small" role="status"><strong class="badge-status status-PENDING">Chế độ demo</strong> Cho phép lễ tân nhận phòng trước giờ thông thường, chỉ đúng ngày nhận dự kiến. Các điều kiện trạng thái và phòng sẵn sàng vẫn áp dụng.</div>
+</header>
+<nav th:fragment="staffnav" th:if="${staff}" class="workspace-nav" aria-label="Chức năng vận hành">
+<div class="container d-flex flex-wrap gap-2">
+<a th:href="@{/staff}">Tổng quan</a>
+<a th:href="@{/staff/bookings}">Đặt phòng</a>
+<a th:href="@{/staff/rooms}">Tình trạng phòng</a>
+<a th:href="@{/staff/invoices}">Hóa đơn</a>
+<a th:href="@{/staff/audit}">Nhật ký</a>
+<th:block th:if="${admin}">
+<a th:href="@{/admin/users}">Tài khoản</a>
+<a th:href="@{/admin/catalog/types}">Loại phòng &amp; giá</a>
+<a th:href="@{/admin/catalog/amenities}">Tiện nghi</a>
+<a th:href="@{/admin/catalog/rooms}">Quản lý phòng</a>
+<a th:href="@{/admin/catalog/services}">Dịch vụ</a>
+<a th:href="@{/admin/revenue}">Doanh thu</a>
+</th:block>
+</div>
+</nav>
+<div th:fragment="flash">
+<div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+<div th:if="${success}" class="alert alert-success" role="status" th:text="${success}">
+</div>
+</div>
+<div th:fragment="errors" th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+<strong>Vui lòng kiểm tra thông tin:</strong>
+<ul class="mb-0">
+<li th:each="e:${#fields.allErrors()}" th:text="${e}">
+</li>
+</ul>
+</div>
+<form th:fragment="search" th:action="@{/rooms}" th:object="${search}" method="get" class="search-panel row g-3 align-items-end">
+<div class="col-md-3">
+<label for="checkIn" class="form-label">Ngày nhận phòng</label>
+<input class="form-control" type="date" th:field="*{checkIn}" th:min="${today}" required>
+<small class="field-error" th:errors="*{checkIn}">
+</small>
+</div>
+<div class="col-md-3">
+<label for="checkOut" class="form-label">Ngày trả phòng</label>
+<input class="form-control" type="date" th:field="*{checkOut}" required>
+<small class="field-error" th:errors="*{checkOut}">
+</small>
+</div>
+<div class="col-md-2">
+<label for="guests" class="form-label">Số khách</label>
+<input class="form-control" type="number" min="1" max="100" th:field="*{guests}" required>
+<small class="field-error" th:errors="*{guests}">
+</small>
+</div>
+<div class="col-md-2">
+<label for="typeId" class="form-label">Loại phòng</label>
+<select class="form-select" th:field="*{typeId}">
+<option value="">Tất cả</option>
+<option th:each="t:${types}" th:value="${t.id}" th:text="${t.name}">
+</option>
+</select>
+</div>
+<div class="col-md-2">
+<button class="btn btn-primary w-100">Tìm phòng ↗</button>
+</div>
+<div class="col-12" th:if="${#fields.hasGlobalErrors()}">
+<div th:replace="~{fragments :: errors}">
+</div>
+</div>
+</form>
+<div th:fragment="policy" class="policy">
+<strong>Thông tin kỳ nghỉ</strong>
+<p class="mb-0">Nhận phòng thông thường 14:00–23:59 đúng ngày đặt · Trả phòng dự kiến 12:00 · Hủy trước 14:00 ngày nhận. Có thể trả ngay sau khi nhận; <strong class="d-inline">trả phòng sớm vẫn tính tiền phòng theo số đêm đã đặt</strong>, cộng dịch vụ đã sử dụng. Chưa có hoàn tiền, giảm tiền theo số đêm thực ở hoặc phí trả sớm. Đơn chờ xác nhận giữ lịch và chưa tự hết hạn. Chưa hỗ trợ đổi phòng/ngày hoặc gia hạn. Thanh toán chỉ mô phỏng.</p>
+</div>
+<footer th:fragment="footer" class="site-footer">
+<div class="container d-flex flex-wrap justify-content-between gap-3">
+<div>
+<strong>LUXURY HOTEL</strong>
+<p class="mb-0">Một kỳ nghỉ đáng nhớ, từ những điều tinh tế.</p>
+</div>
+<div>Hệ thống quản lý khách sạn<small class="d-block">Giờ Việt Nam · VND · Thanh toán mô phỏng</small>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Hóa đơn & thanh toán')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">LỄ TÂN · ĐỐI CHIẾU</div>
+<h1>Hóa đơn &amp; thanh toán</h1>
+<p class="text-muted">Tra cứu hóa đơn đã chốt và theo dõi các khoản chưa thanh toán.</p>
+</div>
+</div>
+<form th:action="@{/staff/invoices}" method="get" class="panel row g-3 mx-0">
+<div class="col-md-7">
+<label class="form-label" for="q">Tìm hóa đơn</label>
+<input id="q" name="q" th:value="${q}" class="form-control" placeholder="Mã hóa đơn, mã đặt phòng, tên khách">
+</div>
+<div class="col-md-3">
+<label class="form-label" for="state">Thanh toán</label>
+<select id="state" name="state" class="form-select">
+<option value="">Tất cả</option>
+<option value="unpaid" th:selected="${state=='unpaid'}">Chưa thanh toán</option>
+<option value="paid" th:selected="${state=='paid'}">Đã thanh toán</option>
+</select>
+</div>
+<div class="col-md-2 d-flex align-items-end">
+<button class="btn btn-primary w-100">Tìm kiếm</button>
+</div>
+</form>
+<div class="table-panel table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Hóa đơn</th>
+<th>Khách hàng</th>
+<th>Ngày lập</th>
+<th>Tổng tiền</th>
+<th>Trạng thái</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="i:${result.content}">
+<td>
+<a class="booking-code" th:href="@{/bookings/{id}/invoice(id=${i.booking.id})}" th:text="${i.code}">
+</a>
+</td>
+<td th:text="${i.customerName}">
+</td>
+<td th:text="${#temporals.format(i.issuedAt,'dd/MM/yyyy HH:mm')}">
+</td>
+<td th:text="${@money.format(i.total)}+' ₫'">
+</td>
+<td>
+<span class="badge-status" th:classappend="${i.paid}?'status-COMPLETED':'status-AWAITING_PAYMENT'" th:text="${i.paid}?'Đã thanh toán':'Chưa thanh toán'">
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="empty" th:if="${result.empty}">
+<h3>Chưa có hóa đơn phù hợp</h3>
+<p>Hóa đơn được lập khi lễ tân trả phòng.</p>
+</div>
+</div>
+<div class="pagination-bar">
+<a th:if="${result.hasPrevious()}" th:href="@{/staff/invoices(q=${q},state=${state},page=${result.number-1})}">← Trước</a>
+<span th:text="'Trang '+${result.number+1}+' / '+${T(java.lang.Math).max(1,result.totalPages)}">
+</span>
+<a th:if="${result.hasNext()}" th:href="@{/staff/invoices(q=${q},state=${state},page=${result.number+1})}">Sau →</a>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

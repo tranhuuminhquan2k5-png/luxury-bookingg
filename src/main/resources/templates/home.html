@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Chào mừng')} ">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<main>
+<section class="hero">
+<div class="container">
+<div class="eyebrow">CHÀO MỪNG ĐẾN VỚI LUXURY HOTEL</div>
+<h1>Chạm vào bình yên.<br>Tận hưởng từng khoảnh khắc.</h1>
+<div class="hero-line">
+</div>
+<p>Không gian thanh lịch, sự chăm sóc tận tâm. Một chốn dừng chân để bạn tìm lại nhịp điệu của riêng mình.</p>
+<a href="#find-room" class="btn btn-gold mt-3">Khám phá kỳ nghỉ của bạn ↗</a>
+</div>
+</section>
+<div class="container search-wrap" id="find-room">
+<form th:replace="~{fragments :: search}">
+</form>
+</div>
+<section class="section container">
+<div class="section-title">
+<div>
+<div class="eyebrow">KHÔNG GIAN DÀNH CHO BẠN</div>
+<h2>Mỗi căn phòng,<br>một trải nghiệm riêng.</h2>
+</div>
+<p class="text-muted d-none d-md-block mb-1">Chọn ngày nghỉ để xem phòng còn trống.<br>Giá minh bạch, trải nghiệm trọn vẹn.</p>
+</div>
+<div class="row g-4">
+<div class="col-md-6 col-xl-3" th:each="t,iter:${types}">
+<article class="room-card">
+<img th:src="@{'/images/room-'+${iter.index%4+1}+'.jpg'}" th:alt="${t.name}" data-fallback="/images/fallback.svg">
+<div class="card-body">
+<div class="eyebrow mb-2" th:text="'TỐI ĐA '+${t.capacity}+' KHÁCH'">
+</div>
+<h3 th:text="${t.name}">
+</h3>
+<p class="text-muted small" th:text="${t.description}">
+</p>
+<p class="price">
+<span th:text="${@money.format(t.price)}">
+</span> ₫ <small>/ đêm</small>
+</p>
+<a class="btn btn-outline-primary w-100" th:href="@{/rooms(checkIn=${today},checkOut=${today.plusDays(1)},guests=2,typeId=${t.id})}">Xem phòng trống ↗</a>
+</div>
+</article>
+</div>
+</div>
+<div class="empty panel" th:if="${#lists.isEmpty(types)}">
+<h3>Chưa có loại phòng đang mở bán</h3>
+<p>Vui lòng quay lại sau khi khách sạn cập nhật danh mục.</p>
+</div>
+</section>
+<section class="feature-strip">
+<div class="container row mx-auto g-4">
+<div class="col-md-4">
+<div class="feature-icon">01.</div>
+<strong>Không gian tinh tế</strong>
+<span class="text-muted small">Thiết kế thanh lịch, tiện nghi cho kỳ nghỉ.</span>
+</div>
+<div class="col-md-4">
+<div class="feature-icon">02.</div>
+<strong>Đặt phòng rõ ràng</strong>
+<span class="text-muted small">Kiểm tra lịch và theo dõi yêu cầu trực tuyến.</span>
+</div>
+<div class="col-md-4">
+<div class="feature-icon">03.</div>
+<strong>Chăm sóc tận tâm</strong>
+<span class="text-muted small">Lễ tân đồng hành trong suốt thời gian lưu trú.</span>
+</div>
+</div>
+</section>
+<div class="container py-4">
+<div th:replace="~{fragments :: policy}">
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

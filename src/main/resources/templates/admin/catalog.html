@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Quản lý danh mục')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page" th:with="title=${kind=='types'?'Loại phòng & giá':(kind=='rooms'?'Quản lý phòng':(kind=='services'?'Dịch vụ':'Tiện nghi'))}">
+<div class="page-head">
+<div>
+<div class="eyebrow">QUẢN TRỊ · DANH MỤC</div>
+<h1 th:text="${title}">
+</h1>
+<p class="text-muted">Cập nhật thông tin và trạng thái hoạt động; dữ liệu lịch sử được giữ nguyên.</p>
+</div>
+<a class="btn btn-primary" th:href="@{/admin/catalog/{kind}/edit(kind=${kind})}">+ Thêm mới</a>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<div class="panel">
+<label class="form-label" for="filter">Tìm trong danh mục</label>
+<input id="filter" class="form-control" data-table-search placeholder="Nhập tên, số phòng hoặc trạng thái">
+</div>
+<div class="table-panel table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th th:text="${kind=='rooms'?'Số phòng':'Tên'}">
+</th>
+<th>Thông tin</th>
+<th>Giá / Trạng thái</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="r:${rows}" data-search-row>
+<th:block th:if="${kind=='types'}">
+<td th:text="${r.name}">
+</td>
+<td>
+<span th:text="${r.capacity}+' khách'">
+</span>
+<small class="d-block text-muted" th:text="${r.description}">
+</small>
+</td>
+<td>
+<strong th:text="${@money.format(r.price)}+' ₫/đêm'">
+</strong>
+<small class="d-block" th:text="${r.active}?'Đang hoạt động':'Ngừng hoạt động'">
+</small>
+</td>
+</th:block>
+<th:block th:if="${kind=='rooms'}">
+<td th:text="${r.number}">
+</td>
+<td>
+<span th:text="${r.roomType.name}">
+</span>
+<small class="d-block text-muted" th:text="'Tầng '+${r.floor}">
+</small>
+</td>
+<td>
+<span class="badge-status" th:classappend="'status-'+${r.status}" th:text="${r.status.label}">
+</span>
+</td>
+</th:block>
+<th:block th:if="${kind=='services'}">
+<td th:text="${r.name}">
+</td>
+<td th:text="'Đơn vị: '+${r.unit}">
+</td>
+<td>
+<strong th:text="${@money.format(r.price)}+' ₫'">
+</strong>
+<small class="d-block" th:text="${r.active}?'Đang hoạt động':'Ngừng hoạt động'">
+</small>
+</td>
+</th:block>
+<th:block th:if="${kind=='amenities'}">
+<td th:text="${r.name}">
+</td>
+<td>Tiện nghi loại phòng</td>
+<td th:text="${r.active}?'Đang hoạt động':'Ngừng hoạt động'">
+</td>
+</th:block>
+<td>
+<a th:href="@{/admin/catalog/{kind}/edit(kind=${kind},id=${r.id})}">Chỉnh sửa ↗</a>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="empty" th:if="${#lists.isEmpty(rows)}">
+<h3>Danh mục đang trống</h3>
+<p>Thêm mục đầu tiên để bắt đầu.</p>
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

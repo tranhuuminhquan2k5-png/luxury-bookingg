@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Chưa thể hoàn tất thao tác')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<main class="container page">
+<div class="panel auth-shell text-center">
+<div class="eyebrow">LUXURY HOTEL · THÔNG BÁO</div>
+<h1>Chưa thể hoàn tất thao tác</h1>
+<p class="text-muted mt-3" th:text="${errorMessage}">Vui lòng kiểm tra lại thông tin.</p>
+<div class="d-flex gap-3 justify-content-center">
+<button class="btn btn-outline-primary" data-back type="button">Quay lại</button>
+<a class="btn btn-primary" th:href="@{/}">Trang chủ</a>
+</div>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

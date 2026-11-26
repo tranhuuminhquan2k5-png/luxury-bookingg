@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Đặt phòng')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">HOÀN TẤT YÊU CẦU</div>
+<h1>Kỳ nghỉ sắp bắt đầu</h1>
+<p class="text-muted">Kiểm tra ngày và thông tin liên hệ trước khi gửi.</p>
+</div>
+</div>
+<div class="row g-4">
+<div class="col-lg-7">
+<form class="panel" th:action="@{/bookings}" th:object="${form}" method="post">
+<div th:replace="~{fragments :: errors}">
+</div>
+<h3 class="mb-4">Thông tin liên hệ</h3>
+<input type="hidden" th:field="*{roomId}">
+<input type="hidden" th:field="*{checkIn}">
+<input type="hidden" th:field="*{checkOut}">
+<input type="hidden" th:field="*{guests}">
+<label class="form-label" for="contactName">Họ tên người nhận phòng</label>
+<input class="form-control mb-1" th:field="*{contactName}" maxlength="100" required>
+<small class="field-error" th:errors="*{contactName}">
+</small>
+<label class="form-label mt-3" for="contactPhone">Số điện thoại</label>
+<input class="form-control" th:field="*{contactPhone}" maxlength="20" required>
+<small class="field-error" th:errors="*{contactPhone}">
+</small>
+<label class="form-label mt-3" for="contactEmail">Email</label>
+<input type="email" class="form-control" th:field="*{contactEmail}" maxlength="190" required>
+<small class="field-error" th:errors="*{contactEmail}">
+</small>
+<label class="form-label mt-3" for="note">Lời nhắn cho lễ tân (tùy chọn)</label>
+<textarea class="form-control" th:field="*{note}" rows="3" maxlength="1000">
+</textarea>
+<small class="field-error" th:errors="*{note}">
+</small>
+<button class="btn btn-primary mt-4 w-100">Gửi yêu cầu đặt phòng ↗</button>
+<small class="text-muted d-block mt-3">Lễ tân sẽ xác nhận yêu cầu. Chưa cần thanh toán khi đặt.</small>
+</form>
+</div>
+<aside class="col-lg-5">
+<div class="panel">
+<h3 th:text="${room.roomType.name}">
+</h3>
+<p class="text-muted" th:text="'Phòng '+${room.number}">
+</p>
+<div class="summary-line">
+<span>Ngày nhận</span>
+<strong th:text="${form.checkIn}">
+</strong>
+</div>
+<div class="summary-line">
+<span>Ngày trả</span>
+<strong th:text="${form.checkOut}">
+</strong>
+</div>
+<div class="summary-line">
+<span>Số khách</span>
+<strong th:text="${form.guests}">
+</strong>
+</div>
+<th:block th:if="${form.checkIn!=null and form.checkOut!=null}" th:with="nights=${T(java.time.temporal.ChronoUnit).DAYS.between(form.checkIn,form.checkOut)}">
+<div class="summary-line">
+<span>Số đêm</span>
+<strong th:text="${nights}">
+</strong>
+</div>
+<div class="summary-line">
+<span>Đơn giá / đêm</span>
+<strong th:text="${@money.format(room.roomType.price)}+' ₫'">
+</strong>
+</div>
+<div class="summary-line">
+<span>Tạm tính tiền phòng</span>
+<strong class="price" th:text="${@money.format(room.roomType.price.multiply(T(java.math.BigDecimal).valueOf(nights)))}+' ₫'">
+</strong>
+</div>
+</th:block>
+<small class="text-muted d-block mt-3">Giá chính thức được lưu khi hệ thống tiếp nhận yêu cầu. Dịch vụ phát sinh được tính riêng khi sử dụng.</small>
+</div>
+</aside>
+</div>
+<div th:replace="~{fragments :: policy}">
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

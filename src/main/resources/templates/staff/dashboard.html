@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Tổng quan vận hành')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">LUXURY HOTEL · VẬN HÀNH</div>
+<h1>Một ngày đón tiếp chu đáo</h1>
+<p class="text-muted" th:text="'Hôm nay, '+${#temporals.format(today,'dd/MM/yyyy')}+' · Giờ Việt Nam'">
+</p>
+</div>
+<a class="btn btn-primary" th:href="@{/staff/bookings}">Tất cả đặt phòng ↗</a>
+</div>
+<div class="row g-3 mb-4">
+<div class="col-6 col-lg-3">
+<a class="stat" th:href="@{/staff/bookings(date=${today},dateKind='in')}">
+<span>Khách đến hôm nay</span>
+<strong class="value" th:text="${counts.arrivals}">
+</strong>
+<small>Xem lịch nhận phòng ↗</small>
+</a>
+</div>
+<div class="col-6 col-lg-3">
+<a class="stat" th:href="@{/staff/bookings(date=${today},dateKind='out',status='CHECKED_IN')}">
+<span>Khách trả hôm nay</span>
+<strong class="value" th:text="${counts.departures}">
+</strong>
+<small>Chuẩn bị trả phòng ↗</small>
+</a>
+</div>
+<div class="col-6 col-lg-3">
+<a class="stat" th:href="@{/staff/bookings(status='PENDING')}">
+<span>Yêu cầu chờ xác nhận</span>
+<strong class="value" th:text="${counts.pending}">
+</strong>
+<small>Xử lý yêu cầu ↗</small>
+</a>
+</div>
+<div class="col-6 col-lg-3">
+<a class="stat" th:href="@{/staff/rooms(status='DIRTY')}">
+<span>Phòng chờ dọn</span>
+<strong class="value" th:text="${counts.dirty}">
+</strong>
+<small>Cập nhật phòng ↗</small>
+</a>
+</div>
+</div>
+<section class="panel">
+<div class="section-title">
+<div>
+<div class="eyebrow mb-2">TIẾP NHẬN YÊU CẦU</div>
+<h3>Đang chờ xác nhận</h3>
+</div>
+<span class="text-muted small" th:text="${counts.occupied}+' / '+${counts.rooms}+' phòng đang có khách'">
+</span>
+</div>
+<div class="table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Khách hàng</th>
+<th>Phòng</th>
+<th>Ngày nhận</th>
+<th>Ngày trả</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="b:${pending.content}">
+<td th:text="${b.contactName}">
+</td>
+<td th:text="${b.room.number}">
+</td>
+<td th:text="${b.checkIn}">
+</td>
+<td th:text="${b.checkOut}">
+</td>
+<td>
+<a th:href="@{/bookings/{id}(id=${b.id})}">Xử lý ↗</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div th:if="${pending.empty}" class="empty">
+<h3>Đã xử lý hết yêu cầu</h3>
+<p>Các yêu cầu mới sẽ xuất hiện tại đây.</p>
+</div>
+</section>
+<div th:replace="~{fragments :: policy}">
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Đặt phòng')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow" th:text="${listPath=='/bookings'?'KỲ NGHỈ & LỊCH SỬ LƯU TRÚ':'LỄ TÂN · ĐẶT PHÒNG'}">
+</div>
+<h1 th:text="${listPath=='/bookings'?'Đặt phòng của tôi':'Quản lý đặt phòng'}">
+</h1>
+<p class="text-muted" th:text="${result.totalElements}+' đơn đặt phòng'">
+</p>
+</div>
+<a th:if="${!staff}" class="btn btn-primary" th:href="@{/#find-room}">Đặt kỳ nghỉ mới ↗</a>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<form class="panel row g-3 mx-0" method="get" th:action="@{${listPath}}">
+<div class="col-md-4">
+<label for="q" class="form-label">Tìm kiếm</label>
+<input id="q" name="q" class="form-control" th:value="${q}" placeholder="Mã đơn, khách hàng, email, phòng">
+</div>
+<div class="col-md-3">
+<label for="status" class="form-label">Trạng thái</label>
+<select id="status" name="status" class="form-select">
+<option value="">Tất cả trạng thái</option>
+<option th:each="s:${bookingStatuses}" th:value="${s}" th:text="${s.label}" th:selected="${status==s.name()}">
+</option>
+</select>
+</div>
+<th:block th:if="${listPath=='/staff/bookings'}">
+<div class="col-md-2">
+<label class="form-label" for="dateKind">Loại ngày</label>
+<select id="dateKind" name="dateKind" class="form-select">
+<option value="in" th:selected="${dateKind=='in'}">Ngày nhận</option>
+<option value="out" th:selected="${dateKind=='out'}">Ngày trả</option>
+</select>
+</div>
+<div class="col-md-2">
+<label class="form-label" for="date">Ngày</label>
+<input id="date" type="date" name="date" th:value="${date}" class="form-control">
+</div>
+</th:block>
+<div class="col-md-1 d-flex align-items-end">
+<button class="btn btn-primary">Lọc</button>
+</div>
+</form>
+<div class="table-panel">
+<div class="table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Đơn đặt phòng</th>
+<th>Khách / Phòng</th>
+<th>Nhận → Trả</th>
+<th>Tiền phòng</th>
+<th>Trạng thái</th>
+<th>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="b:${result.content}">
+<td>
+<a class="booking-code" th:href="@{/bookings/{id}(id=${b.id})}" th:text="${b.code}">
+</a>
+<small class="d-block text-muted" th:text="${#temporals.format(b.createdAt,'dd/MM/yyyy HH:mm')}">
+</small>
+<small th:if="${b.demo}" class="text-muted">Dữ liệu demo</small>
+</td>
+<td>
+<strong th:text="${b.contactName}">
+</strong>
+<small class="d-block text-muted" th:text="'Phòng '+${b.room.number}+' · '+${b.guests}+' khách'">
+</small>
+</td>
+<td>
+<span th:text="${#temporals.format(b.checkIn,'dd/MM/yyyy')}">
+</span>
+<br>
+<span th:text="${#temporals.format(b.checkOut,'dd/MM/yyyy')}">
+</span>
+</td>
+<td th:text="${@money.format(b.roomTotal)}+' ₫'">
+</td>
+<td>
+<span class="badge-status" th:classappend="'status-'+${b.status}" th:text="${b.status.label}">
+</span>
+</td>
+<td>
+<a th:href="@{/bookings/{id}(id=${b.id})}">Chi tiết ↗</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="empty" th:if="${result.empty}">
+<h3>Chưa có đơn phù hợp</h3>
+<p>Thay đổi bộ lọc hoặc bắt đầu một kỳ nghỉ mới.</p>
+</div>
+</div>
+<div class="pagination-bar">
+<a class="btn btn-outline-primary btn-sm" th:if="${result.hasPrevious()}" th:href="@{${listPath}(q=${q},status=${status},date=${date},dateKind=${dateKind},page=${result.number-1})}">← Trước</a>
+<span th:text="'Trang '+${result.number+1}+' / '+${T(java.lang.Math).max(1,result.totalPages)}">
+</span>
+<a class="btn btn-outline-primary btn-sm" th:if="${result.hasNext()}" th:href="@{${listPath}(q=${q},status=${status},date=${date},dateKind=${dateKind},page=${result.number+1})}">Sau →</a>
+</div>
+<div th:replace="~{fragments :: policy}">
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

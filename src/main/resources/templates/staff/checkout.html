@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Xác nhận trả phòng')}"></head>
+<body>
+<header th:replace="~{fragments :: siteHeader}"></header>
+<nav th:replace="~{fragments :: staffnav}"></nav>
+<main class="container page" th:with="b=${summary.booking}">
+  <div class="invoice">
+    <div class="page-head">
+      <div><div class="eyebrow">LỄ TÂN · KẾT THÚC LƯU TRÚ</div><h1>Xác nhận trả phòng</h1></div>
+      <a th:href="@{/bookings/{id}(id=${b.id})}">← Quay lại đơn</a>
+    </div>
+    <div th:replace="~{fragments :: flash}"></div>
+    <div th:if="${summary.early}" class="alert alert-warning" role="alert">
+      <strong>Khách đang trả phòng sớm.</strong> Thời điểm hiện tại trước giờ trả dự kiến.
+    </div>
+    <section class="panel">
+      <h2 class="h3 mb-4">Thông tin đối chiếu</h2>
+      <dl class="meta-grid">
+        <div><dt>Mã đặt phòng</dt><dd class="booking-code" th:text="${b.code}"></dd></div>
+        <div><dt>Khách hàng / phòng</dt><dd th:text="${b.contactName}+' · Phòng '+${b.room.number}"></dd></div>
+        <div><dt>Ngày nhận dự kiến</dt><dd th:text="${#temporals.format(b.checkIn,'dd/MM/yyyy')}"></dd></div>
+        <div><dt>Ngày trả dự kiến (giữ nguyên)</dt><dd th:text="${#temporals.format(b.checkOut,'dd/MM/yyyy')}+' · '+${checkOutTime}"></dd></div>
+        <div><dt>Nhận phòng thực tế</dt><dd th:text="${#temporals.format(b.checkedInAt,'dd/MM/yyyy HH:mm:ss')}"></dd></div>
+        <div><dt>Thời điểm hiện tại · giờ Việt Nam</dt><dd th:text="${#temporals.format(summary.actualCheckout,'dd/MM/yyyy HH:mm:ss')}"></dd></div>
+        <div><dt>Số đêm tính tiền theo đơn</dt><dd th:text="${b.nights}+' đêm'"></dd></div>
+        <div><dt>Đơn giá phòng đã lưu / đêm</dt><dd th:text="${@money.format(b.nightlyPrice)}+' ₫'"></dd></div>
+      </dl>
+      <h3 class="h4 mt-4">Dịch vụ đã ghi nhận</h3>
+      <div class="table-responsive">
+        <table class="table"><thead><tr><th>Dịch vụ</th><th>Số lượng</th><th>Đơn giá đã lưu</th><th>Thành tiền</th></tr></thead>
+          <tbody><tr th:each="s:${summary.services}"><td th:text="${s.description}"></td><td th:text="${s.quantity}"></td><td th:text="${@money.format(s.unitPrice)}+' ₫'"></td><td th:text="${@money.format(s.total)}+' ₫'"></td></tr></tbody>
+        </table>
+      </div>
+      <p th:if="${#lists.isEmpty(summary.services)}" class="text-muted mt-3">Không có dịch vụ phát sinh.</p>
+      <div class="summary-line"><span>Tiền phòng theo toàn bộ số đêm đã đặt</span><strong th:text="${@money.format(b.roomTotal)}+' ₫'"></strong></div>
+      <div class="summary-line"><span>Tiền dịch vụ thực tế đã ghi nhận</span><strong th:text="${@money.format(summary.serviceTotal)}+' ₫'"></strong></div>
+      <div class="summary-line"><strong>Tổng thanh toán dự kiến</strong><strong class="invoice-total" th:text="${@money.format(summary.total)}+' ₫'"></strong></div>
+      <div class="policy"><strong>Trả phòng sớm vẫn tính tiền phòng theo số đêm đã đặt.</strong>
+        <p class="mb-0">Không hoàn tiền, giảm tiền theo số đêm thực ở hoặc tính phí trả sớm. Khoảng lưu trú vài phút không làm tiền phòng thành 0. Thời điểm trả thực tế được ghi khi xác nhận; ngày dự kiến giữ nguyên. Nếu vừa ghi thêm dịch vụ ở phiên khác, số tiền được cập nhật khi lập hóa đơn.</p>
+      </div>
+      <form th:action="@{/staff/bookings/{id}/action(id=${b.id})}" method="post" data-confirm="Xác nhận trả phòng và chốt hóa đơn? Tiền phòng vẫn tính đủ số đêm đã đặt, cộng dịch vụ. Sau khi chốt không thể thêm dịch vụ.">
+        <input type="hidden" name="action" value="checkout">
+        <label class="form-label" for="checkoutReason">Lý do trả sớm / ghi chú trả phòng (không bắt buộc)</label>
+        <textarea id="checkoutReason" name="reason" class="form-control" maxlength="500" rows="3" th:text="${checkoutReason}"></textarea>
+        <small class="text-muted">Tối đa 500 ký tự. Người thực hiện được ghi nhận theo tài khoản đang đăng nhập.</small>
+        <div class="d-flex flex-wrap gap-3 mt-4"><button class="btn btn-primary">Xác nhận trả phòng &amp; lập hóa đơn</button><a class="btn btn-outline-primary" th:href="@{/bookings/{id}(id=${b.id})}">Chưa trả phòng</a></div>
+      </form>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body></html>

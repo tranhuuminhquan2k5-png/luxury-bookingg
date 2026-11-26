@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Tình trạng phòng')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">LỄ TÂN · BUỒNG PHÒNG</div>
+<h1>Tình trạng phòng</h1>
+<p class="text-muted">Tình trạng hiện tại phục vụ nhận khách và dọn phòng. Lịch đặt được quản lý riêng.</p>
+</div>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<form method="get" th:action="@{/staff/rooms}" class="panel row g-3 mx-0">
+<div class="col-md-5">
+<label class="form-label" for="q">Số phòng</label>
+<input id="q" name="q" th:value="${q}" class="form-control">
+</div>
+<div class="col-md-5">
+<label class="form-label" for="status">Trạng thái vận hành</label>
+<select id="status" name="status" class="form-select">
+<option value="">Tất cả</option>
+<option th:each="s:${roomStatuses}" th:value="${s}" th:text="${s.label}" th:selected="${status==s.name()}">
+</option>
+</select>
+</div>
+<div class="col-md-2 d-flex align-items-end">
+<button class="btn btn-primary w-100">Lọc phòng</button>
+</div>
+</form>
+<div class="row g-3">
+<div th:each="r:${rooms}" class="col-md-4 col-xl-3">
+<article class="room-tile h-100">
+<div class="d-flex justify-content-between align-items-start">
+<h3 th:text="${r.number}">
+</h3>
+<span class="badge-status" th:classappend="'status-'+${r.status}" th:text="${r.status.label}">
+</span>
+</div>
+<p class="mb-1" th:text="${r.roomType.name}">
+</p>
+<small class="text-muted" th:text="'Tầng '+${r.floor}">
+</small>
+<form th:if="${r.status.name()=='DIRTY'}" th:action="@{/staff/rooms/{id}/clean(id=${r.id})}" method="post" data-confirm="Đã dọn và kiểm tra phòng sẵn sàng đón khách?">
+<button class="btn btn-outline-primary w-100 mt-3">Xác nhận đã dọn</button>
+</form>
+</article>
+</div>
+</div>
+<div class="empty panel" th:if="${#lists.isEmpty(rooms)}">
+<h3>Không có phòng phù hợp</h3>
+<p>Thử bộ lọc khác.</p>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

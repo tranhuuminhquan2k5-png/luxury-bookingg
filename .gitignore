@@ -1,0 +1,8 @@
+/target/
+/.tools/
+/.local/
+/.env
+*.log
+*.sql.bak
+.idea/
+*.iml

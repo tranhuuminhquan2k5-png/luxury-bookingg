@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Hồ sơ cá nhân')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="auth-shell panel">
+<div class="eyebrow">TÀI KHOẢN CỦA BẠN</div>
+<h1>Hồ sơ cá nhân</h1>
+<div th:replace="~{fragments :: flash}">
+</div>
+<p class="text-muted" th:text="${currentUser.email}">
+</p>
+<form th:action="@{/profile}" th:object="${form}" method="post">
+<div th:replace="~{fragments :: errors}">
+</div>
+<label class="form-label" for="fullName">Họ và tên</label>
+<input class="form-control" th:field="*{fullName}" maxlength="100" required>
+<small class="field-error" th:errors="*{fullName}">
+</small>
+<label class="form-label" for="phone">Số điện thoại</label>
+<input class="form-control" th:field="*{phone}" maxlength="20" required>
+<small class="field-error" th:errors="*{phone}">
+</small>
+<label class="form-label" for="address">Địa chỉ</label>
+<textarea class="form-control" th:field="*{address}" maxlength="250" rows="3">
+</textarea>
+<small class="field-error" th:errors="*{address}">
+</small>
+<button class="btn btn-primary w-100 mt-4">Lưu thay đổi</button>
+</form>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

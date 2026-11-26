@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Chi tiết đặt phòng')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page" th:with="b=${booking},state=${booking.status.name()}">
+<a class="small" th:href="${staff}?@{/staff/bookings}:@{/bookings}">← Danh sách đặt phòng</a>
+<div class="page-head mt-3">
+<div>
+<div class="eyebrow">CHI TIẾT YÊU CẦU</div>
+<h1 th:text="'Phòng '+${b.room.number}+' · '+${b.room.roomType.name}">
+</h1>
+<span class="booking-code" th:text="${b.code}">
+</span>
+<span th:if="${b.demo}" class="tag">Dữ liệu demo</span>
+</div>
+<span class="badge-status" th:classappend="'status-'+${b.status}" th:text="${b.status.label}">
+</span>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<div th:if="${state=='CHECKED_IN' and now.isAfter(b.checkOut.atTime(checkOutTime))}" class="alert alert-warning">Đã quá giờ trả phòng dự kiến. Phiên bản hiện tại chưa tính phụ thu trả muộn; tiền phòng vẫn theo số đêm đã đặt.</div>
+<div class="row g-4">
+<div class="col-lg-8">
+<section class="panel">
+<h3 class="mb-4">Thông tin lưu trú</h3>
+<dl class="meta-grid mb-0">
+<div>
+<dt>Khách nhận phòng</dt>
+<dd th:text="${b.contactName}">
+</dd>
+</div>
+<div>
+<dt>Liên hệ</dt>
+<dd>
+<span th:text="${b.contactPhone}">
+</span>
+<small class="d-block" th:text="${b.contactEmail}">
+</small>
+</dd>
+</div>
+<div>
+<dt>Ngày nhận · từ 14:00</dt>
+<dd th:text="${#temporals.format(b.checkIn,'dd/MM/yyyy')}">
+</dd>
+</div>
+<div>
+<dt>Ngày trả · dự kiến 12:00</dt>
+<dd th:text="${#temporals.format(b.checkOut,'dd/MM/yyyy')}">
+</dd>
+</div>
+<div>
+<dt>Số đêm / số khách</dt>
+<dd th:text="${b.nights}+' đêm · '+${b.guests}+' khách'">
+</dd>
+</div>
+<div>
+<dt>Giá đã lưu / đêm</dt>
+<dd th:text="${@money.format(b.nightlyPrice)}+' ₫'">
+</dd>
+</div>
+<div th:if="${b.checkedInAt!=null}">
+<dt>Nhận thực tế</dt>
+<dd th:text="${#temporals.format(b.checkedInAt,'dd/MM/yyyy HH:mm')}">
+</dd>
+</div>
+<div th:if="${b.checkedOutAt!=null}">
+<dt>Trả thực tế</dt>
+<dd th:text="${#temporals.format(b.checkedOutAt,'dd/MM/yyyy HH:mm')}">
+</dd>
+</div>
+<div th:if="${b.checkedOutBy!=null}"><dt>Người thực hiện trả phòng</dt><dd th:text="${b.checkedOutBy.fullName}"></dd></div>
+<div th:if="${b.checkoutReason!=null}"><dt>Lý do trả phòng</dt><dd th:text="${b.checkoutReason}"></dd></div>
+</dl>
+<p th:if="${!#strings.isEmpty(b.note)}" class="policy mb-0" th:text="${b.note}">
+</p>
+<div class="summary-line mt-3">
+<strong>Tiền phòng</strong>
+<strong class="price" th:text="${@money.format(b.roomTotal)}+' ₫'">
+</strong>
+</div>
+</section>
+<section class="panel">
+<h3>Dịch vụ đã sử dụng</h3>
+<div class="table-responsive mt-3">
+<table class="table">
+<thead>
+<tr>
+<th>Dịch vụ / thời điểm</th>
+<th>SL</th>
+<th>Đơn giá đã lưu</th>
+<th>Thành tiền</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="s:${usedServices}">
+<td>
+<span th:text="${s.description}">
+</span>
+<small class="d-block text-muted" th:text="${#temporals.format(s.usedAt,'dd/MM/yyyy HH:mm')}">
+</small>
+</td>
+<td th:text="${s.quantity}">
+</td>
+<td th:text="${@money.format(s.unitPrice)}+' ₫'">
+</td>
+<td th:text="${@money.format(s.total)}+' ₫'">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-muted mt-3" th:if="${#lists.isEmpty(usedServices)}">Chưa ghi nhận dịch vụ.</p>
+<form th:if="${staff and state=='CHECKED_IN'}" th:action="@{/staff/bookings/{id}/services(id=${b.id})}" th:object="${useForm}" method="post" class="row g-3 mt-2">
+<div class="col-md-7">
+<label for="serviceId" class="form-label">Thêm dịch vụ</label>
+<select class="form-select" th:field="*{serviceId}" required>
+<option value="">Chọn dịch vụ</option>
+<option th:each="s:${services}" th:value="${s.id}" th:text="${s.name}+' · '+${@money.format(s.price)}+' ₫/'+${s.unit}">
+</option>
+</select>
+</div>
+<div class="col-md-2">
+<label for="quantity" class="form-label">Số lượng</label>
+<input class="form-control" type="number" th:field="*{quantity}" min="1" max="10000" required>
+</div>
+<div class="col-md-3 d-flex align-items-end">
+<button class="btn btn-primary w-100">Ghi nhận</button>
+</div>
+</form>
+</section>
+<section class="panel">
+<h3>Lịch sử trạng thái</h3>
+<ul class="timeline mb-0">
+<li th:each="h:${history}">
+<strong th:text="${T(vn.luxuryhotel.entity.BookingStatus).valueOf(h.toStatus).label}">
+</strong>
+<p class="mb-0" th:text="${h.reason}">
+</p>
+<small th:text="${#temporals.format(h.createdAt,'dd/MM/yyyy HH:mm')}+' · '+${h.actor.fullName}">
+</small>
+</li>
+</ul>
+</section>
+</div>
+<aside class="col-lg-4">
+<section class="panel">
+<h3>Thao tác</h3>
+<a th:if="${invoice!=null}" class="btn btn-primary w-100 mt-3" th:href="@{/bookings/{id}/invoice(id=${b.id})}">Xem hóa đơn ↗</a>
+<form th:if="${(state=='PENDING' or state=='CONFIRMED') and now.isBefore(b.checkIn.atTime(checkInTime))}" th:action="@{/bookings/{id}/cancel(id=${b.id})}" method="post" data-confirm="Hủy đơn này và giải phóng lịch phòng? Không thể khôi phục đơn đã hủy.">
+<button class="btn btn-outline-danger w-100 mt-3">Hủy đặt phòng</button>
+</form>
+<th:block th:if="${staff}">
+<form th:if="${state=='PENDING'}" th:action="@{/staff/bookings/{id}/action(id=${b.id})}" method="post">
+<input type="hidden" name="action" value="confirm">
+<button class="btn btn-primary w-100 mt-3">Xác nhận yêu cầu</button>
+</form>
+<form th:if="${state=='PENDING'}" th:action="@{/staff/bookings/{id}/action(id=${b.id})}" method="post" data-confirm="Từ chối yêu cầu này và giải phóng lịch phòng?">
+<input type="hidden" name="action" value="reject">
+<label class="form-label mt-3" for="reason">Lý do từ chối</label>
+<textarea id="reason" name="reason" class="form-control" maxlength="1000" required rows="2">
+</textarea>
+<button class="btn btn-outline-danger w-100 mt-2">Từ chối yêu cầu</button>
+</form>
+<form th:if="${state=='CONFIRMED'}" th:action="@{/staff/bookings/{id}/action(id=${b.id})}" method="post" data-confirm="Đã đối chiếu thông tin khách và kiểm tra phòng sẵn sàng?">
+<input type="hidden" name="action" value="checkin">
+<button class="btn btn-primary w-100 mt-3">Nhận phòng</button>
+</form>
+<form th:if="${state=='CONFIRMED'}" th:action="@{/staff/bookings/{id}/action(id=${b.id})}" method="post" data-confirm="Xác nhận khách không đến? Chỉ được thực hiện sau 23:59 ngày nhận.">
+<input type="hidden" name="action" value="noshow">
+<button class="btn btn-outline-primary w-100 mt-3">Đánh dấu không đến</button>
+</form>
+<a th:if="${state=='CHECKED_IN'}" th:href="@{/staff/bookings/{id}/checkout(id=${b.id})}" class="btn btn-primary w-100 mt-3">Trả phòng</a>
+<p th:if="${state=='CHECKED_IN'}" class="small text-muted mt-2">Xem số tiền trước khi xác nhận. Trả phòng sớm vẫn tính tiền phòng theo số đêm đã đặt.</p>
+</th:block>
+<p class="small text-muted mt-3 mb-0" th:if="${state=='PENDING'}">Yêu cầu đang giữ lịch phòng cho đến khi được xử lý. Chưa có cơ chế tự hết hạn.</p>
+<p class="small text-muted mt-3 mb-0" th:if="${state=='AWAITING_PAYMENT'}">Hóa đơn đã chốt. Chờ lễ tân ghi nhận thanh toán mô phỏng.</p>
+<p class="small text-muted mt-3 mb-0" th:if="${state=='COMPLETED' or state=='CANCELLED' or state=='REJECTED' or state=='NO_SHOW'}">Đơn đã kết thúc. Bạn có thể tra cứu thông tin và lịch sử tại đây.</p>
+</section>
+<div th:replace="~{fragments :: policy}">
+</div>
+</aside>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

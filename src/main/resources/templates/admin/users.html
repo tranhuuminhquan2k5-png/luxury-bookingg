@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Quản lý tài khoản')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">QUẢN TRỊ · PHÂN QUYỀN</div>
+<h1>Quản lý tài khoản</h1>
+<p class="text-muted">Khóa và thay đổi quyền có hiệu lực với cả phiên đang đăng nhập. Luôn giữ một quản trị viên hoạt động.</p>
+</div>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<form th:action="@{/admin/users}" method="get" class="panel d-flex gap-3">
+<label class="visually-hidden" for="q">Tìm tài khoản</label>
+<input id="q" name="q" th:value="${q}" class="form-control" placeholder="Tìm theo họ tên hoặc email">
+<button class="btn btn-primary">Tìm kiếm</button>
+</form>
+<div class="table-panel table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Tài khoản</th>
+<th>Liên hệ</th>
+<th>Vai trò &amp; trạng thái</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="u:${result.content}">
+<td>
+<strong th:text="${u.fullName}">
+</strong>
+<small class="d-block text-muted" th:text="${u.email}">
+</small>
+<small th:if="${u.demo}" class="text-muted">Tài khoản demo</small>
+</td>
+<td th:text="${u.phone}">
+</td>
+<td>
+<form th:action="@{/admin/users}" method="post" class="d-flex flex-wrap gap-2 align-items-center" data-confirm="Cập nhật vai trò và quyền truy cập tài khoản này?">
+<input name="id" type="hidden" th:value="${u.id}">
+<label class="visually-hidden" th:for="'role-'+${u.id}">Vai trò</label>
+<select th:id="'role-'+${u.id}" name="role" class="form-select w-auto">
+<option value="CUSTOMER" th:selected="${u.role.name=='CUSTOMER'}">Khách hàng</option>
+<option value="STAFF" th:selected="${u.role.name=='STAFF'}">Lễ tân</option>
+<option value="ADMIN" th:selected="${u.role.name=='ADMIN'}">Quản trị</option>
+</select>
+<label class="small d-flex gap-2">
+<input type="checkbox" name="enabled" value="true" th:checked="${u.enabled}"> Hoạt động</label>
+<button class="btn btn-outline-primary btn-sm">Lưu</button>
+</form>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="empty" th:if="${result.empty}">Không có tài khoản phù hợp.</div>
+</div>
+<div class="pagination-bar">
+<a th:if="${result.hasPrevious()}" th:href="@{/admin/users(q=${q},page=${result.number-1})}">← Trước</a>
+<span th:text="'Trang '+${result.number+1}+' / '+${T(java.lang.Math).max(1,result.totalPages)}">
+</span>
+<a th:if="${result.hasNext()}" th:href="@{/admin/users(q=${q},page=${result.number+1})}">Sau →</a>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Hóa đơn lưu trú')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="invoice">
+<div class="page-head no-print">
+<a th:href="@{/bookings/{id}(id=${invoice.booking.id})}">← Chi tiết đặt phòng</a>
+<button class="btn btn-outline-primary" type="button" data-print>In hóa đơn</button>
+</div>
+<div th:replace="~{fragments :: flash}">
+</div>
+<article class="panel">
+<div class="invoice-header d-flex flex-wrap justify-content-between gap-3">
+<div>
+<div class="eyebrow">LUXURY HOTEL</div>
+<h1 class="h2">Hóa đơn lưu trú</h1>
+<span class="booking-code" th:text="${invoice.code}">
+</span>
+</div>
+<div>
+<span class="badge-status" th:classappend="${invoice.paid}?'status-COMPLETED':'status-AWAITING_PAYMENT'" th:text="${invoice.paid}?'Đã thanh toán':'Chưa thanh toán'">
+</span>
+<small class="d-block mt-2" th:text="${#temporals.format(invoice.issuedAt,'dd/MM/yyyy HH:mm')}">
+</small>
+</div>
+</div>
+<dl class="meta-grid">
+<div>
+<dt>Khách hàng</dt>
+<dd th:text="${invoice.customerName}">
+</dd>
+</div>
+<div>
+<dt>Email liên hệ</dt>
+<dd th:text="${invoice.customerEmail}">
+</dd>
+</div>
+<div>
+<dt>Phòng</dt>
+<dd th:text="${invoice.roomNumber}">
+</dd>
+</div>
+<div>
+<dt>Mã đặt phòng</dt>
+<dd class="booking-code" th:text="${invoice.booking.code}">
+</dd>
+</div>
+</dl>
+<div class="table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Nội dung</th>
+<th>Số lượng</th>
+<th>Đơn giá</th>
+<th>Thành tiền</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="i:${items}">
+<td th:text="${i.description}">
+</td>
+<td th:text="${i.quantity}">
+</td>
+<td th:text="${@money.format(i.unitPrice)}+' ₫'">
+</td>
+<td th:text="${@money.format(i.total)}+' ₫'">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="row justify-content-end mt-4">
+<div class="col-md-6">
+<div class="summary-line">
+<span>Tiền phòng</span>
+<strong th:text="${@money.format(invoice.roomTotal)}+' ₫'">
+</strong>
+</div>
+<div class="summary-line">
+<span>Tiền dịch vụ</span>
+<strong th:text="${@money.format(invoice.serviceTotal)}+' ₫'">
+</strong>
+</div>
+<div class="summary-line">
+<strong>Tổng cộng</strong>
+<strong class="invoice-total" th:text="${@money.format(invoice.total)}+' ₫'">
+</strong>
+</div>
+</div>
+</div>
+<p class="small text-muted mt-4 mb-0">Các dòng hóa đơn được chốt khi trả phòng. Thanh toán mô phỏng, không kết nối ngân hàng. Chưa áp dụng giảm giá, thuế tách riêng hoặc phụ thu.</p>
+<p th:if="${invoice.booking.demo}" class="small text-muted">Đơn demo — khoản thu được tách khỏi doanh thu thông thường.</p>
+</article>
+<section th:if="${staff and !invoice.paid}" class="panel no-print">
+<h3>Ghi nhận thanh toán mô phỏng</h3>
+<p class="text-muted">Chọn kết quả mô phỏng. Lần thất bại được lưu lại và có thể thử lại.</p>
+<form th:action="@{/staff/bookings/{id}/pay(id=${invoice.booking.id})}" method="post" class="d-flex flex-wrap gap-2" data-confirm="Ghi nhận kết quả thanh toán mô phỏng cho hóa đơn này?">
+<button name="outcome" value="success" class="btn btn-primary">Mô phỏng thành công</button>
+<button name="outcome" value="failed" class="btn btn-outline-danger">Mô phỏng thất bại</button>
+</form>
+</section>
+<section class="panel no-print">
+<h3>Lịch sử thanh toán</h3>
+<div class="table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Thời điểm</th>
+<th>Mã tham chiếu</th>
+<th>Kết quả</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="a:${attempts}">
+<td th:text="${#temporals.format(a.attemptedAt,'dd/MM/yyyy HH:mm:ss')}">
+</td>
+<td class="booking-code" th:text="${a.reference}">
+</td>
+<td th:text="${a.successful}?'Thành công':'Thất bại'">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-muted mt-3" th:if="${#lists.isEmpty(attempts)}">Chưa có lần thanh toán nào.</p>
+</section>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>

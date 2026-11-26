@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Nhật ký nghiệp vụ')}">
+</head>
+<body>
+<header th:replace="~{fragments :: siteHeader}">
+</header>
+<nav th:replace="~{fragments :: staffnav}">
+</nav>
+<main class="container page">
+<div class="page-head">
+<div>
+<div class="eyebrow">TRA CỨU VẬN HÀNH</div>
+<h1>Nhật ký nghiệp vụ</h1>
+</div>
+</div>
+<form th:action="@{/staff/audit}" method="get" class="panel d-flex gap-3">
+<label class="visually-hidden" for="q">Tìm nhật ký</label>
+<input id="q" name="q" th:value="${q}" class="form-control" placeholder="Tìm mã đơn, nội dung, thao tác">
+<button class="btn btn-primary">Tìm kiếm</button>
+</form>
+<div class="table-panel table-responsive">
+<table class="table">
+<thead>
+<tr>
+<th>Thời điểm</th>
+<th>Người thực hiện</th>
+<th>Thao tác</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="a:${result.content}">
+<td th:text="${#temporals.format(a.createdAt,'dd/MM/yyyy HH:mm:ss')}">
+</td>
+<td th:text="${a.actor.fullName}">
+</td>
+<td th:text="${a.action}">
+</td>
+<td th:text="${a.detail}">
+</td>
+</tr>
+</tbody>
+</table>
+<div class="empty" th:if="${result.empty}">Chưa có nhật ký phù hợp.</div>
+</div>
+<div class="pagination-bar">
+<a th:if="${result.hasPrevious()}" th:href="@{/staff/audit(q=${q},page=${result.number-1})}">← Trước</a>
+<span th:text="'Trang '+${result.number+1}+' / '+${T(java.lang.Math).max(1,result.totalPages)}">
+</span>
+<a th:if="${result.hasNext()}" th:href="@{/staff/audit(q=${q},page=${result.number+1})}">Sau →</a>
+</div>
+</main>
+<footer th:replace="~{fragments :: footer}">
+</footer>
+</body>
+</html>
